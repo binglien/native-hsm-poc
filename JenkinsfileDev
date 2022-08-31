@@ -1,0 +1,108 @@
+pipeline 
+{
+    agent 
+    {
+        label '100_57'
+    }
+
+    environment 
+    {   
+        JAVA_HOME = "${env.GRAALVM_HOME_17}"
+        GRAALVM_HOME = "${env.GRAALVM_HOME_17}"
+    }
+
+    stages 
+    {
+        stage("git") 
+        {
+            steps  
+            {
+                timestamps 
+                {
+                	sshagent(credentials: ['jenkins_ssh']) {
+    	                sh 'git branch --set-upstream-to=origin/'+ env.GIT_LOCAL_BRANCH + ' ' + env.GIT_LOCAL_BRANCH 
+                        sh 'git reset --hard HEAD'
+    	            }
+                }
+            }
+        }
+
+
+        stage("./mvnw clean deploy") 
+        {
+            steps  
+            {
+                timestamps 
+                {
+                    sh './mvnw -DskipStaging=false clean deploy'
+                }
+            }
+        }
+        
+        stage("./mvnw jib:build") 
+        {
+            steps  
+            {
+                timestamps 
+                {
+                    echo 'IMAGE_REGISTRY = ' + env.IMAGE_REGISTRY
+                    echo 'IMAGE_REGISTRY_USER = ' + env.IMAGE_REGISTRY_USER 
+                    sh './mvnw -DsendCredentialsOverHttp=true -Djib.to.auth.username=' + env.IMAGE_REGISTRY_USER + ' -Djib.to.auth.password=' + env.IMAGE_REGISTRY_MEMA + ' jib:build'
+                }
+            }
+        }      
+        
+    }
+
+    post 
+    {
+        always 
+        {
+            timestamps 
+            {
+                 sh 'echo "This will always run"'
+                 
+            }
+        }  
+        success 
+        {
+            timestamps 
+            {
+                sh 'echo "This will run only if successful"'
+            }
+        }
+        failure 
+        {
+            timestamps 
+            {
+                sh 'echo "This will run only if failed"'
+            }
+        }
+        unstable 
+        {
+            timestamps 
+            {
+                sh 'echo "This will run only if the run was marked as unstable"'
+            }
+        }
+        changed 
+        {
+            timestamps 
+            {
+                sh 'echo "This will run only if the state of the Pipeline has changed"'
+                sh 'echo "For example, the Pipeline was previously failing but is now successful"'
+                sh 'echo "... or the other way around :)"'
+            }
+        }
+   	    cleanup 
+   	    { 
+            timestamps 
+            {
+                 sh 'echo "This will clean up workspace..."'
+                 
+            }
+   	    	cleanWs() 
+   	    }
+    }
+}
+

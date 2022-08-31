@@ -1,0 +1,45 @@
+#*****************************************************************************************
+# Copyright (c) 2020, HiTRUST and/or its affiliates. All rights reserved.
+# HiTRUST PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+#
+# Modify History:
+# 2020/07/06, v1.0.0, Bing.   First version
+#*****************************************************************************************
+# Please maintain ONLY shared properties of your application in this file, 
+# move different properties of your application to src/main/resources/application-<profiles>.yml
+# move default properties of common Spring Boot/Cloud Client to src/main/resources/bootstrap.yml
+
+
+###############################################################################
+## Logging Information
+###############################################################################
+logging:
+  level:
+    org.springframework: INFO
+    com.hitrust: INFO
+    com.hitrust.mgear: TRACE#  file:#    name: test.log#    path: ./  pattern:#    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t] (%F:%L) <%M> %m%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t] (%F:%L) <%M> %m%n"
+###############################################################################
+## Session Management related
+###############################################################################       
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      #bootstrap-servers: my-cluster-kafka-bootstrap-test003.apps.cluster-a.a.hirhcos.com:80
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      bootstrap-servers: localhost:9092
+      #bootstrap-servers: my-cluster-kafka-bootstrap-test003.apps.cluster-a.a.hirhcos.com:80
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      #group-id: asym
+      properties.spring.json.trusted.packages: '*'
+      auto-offset-reset: earliest
+
+
+#spring.cloud.stream.kafka.binder.brokers: ${spring.kafka.producer.bootstrap-servers}
+#spring.cloud.stream.kafka.binder.consumerProperties.bootstrap.servers: ${spring.kafka.producer.bootstrap-servers}

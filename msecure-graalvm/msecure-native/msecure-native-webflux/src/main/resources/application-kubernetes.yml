@@ -1,0 +1,7 @@
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: my-cluster-kafka-bootstrap.test003.svc:9092
+    consumer:
+      bootstrap-servers: my-cluster-kafka-bootstrap.test003.svc:9092
+ 

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.hitrust.mgear.demo</groupId>
+	<artifactId>native-hsm-poc</artifactId>
+	<version>5.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>native-hsm-poc</name>
+
+	<properties>
+		<!-- Maven -->
+		<java.version>17</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<main.basedir>${basedir}</main.basedir>
+		<maven.test.skip>true</maven.test.skip>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+		<maven-war-plugin.version>3.3.1</maven-war-plugin.version>
+		<maven.test.skip>true</maven.test.skip>
+
+		<!-- Spring -->
+		<springframework.version>5.3.22</springframework.version>
+		<spring-boot.version>2.7.2</spring-boot.version>
+		<spring-cloud.version>2021.0.3</spring-cloud.version>
+
+		<!-- Nexus -->
+		<skipStaging>true</skipStaging>
+
+		<!-- Google JIB -->
+		<jib.version>3.2.1</jib.version>
+		<jib.skip>true</jib.skip>
+		<jib.mainClass>com.hitrust.mgear.demo.serverless.hsm.web.FunctionWebApplication</jib.mainClass>
+		<jib.from-image>${env.IMAGE_REGISTRY}/rhel8/ubi8-openjdk-17</jib.from-image>
+
+		<!-- Oracle GraalVM -->
+		<native.maven.plugin.version>0.9.13</native.maven.plugin.version>
+		<native.skip>true</native.skip>
+		<springAot>false</springAot>
+		<!-- HiTRUST Commons -->
+		<mscale-mt.version>1.3.80</mscale-mt.version>
+		<mscale-ms-common.version>${mscale-mt.version}</mscale-ms-common.version>
+		<mscale-common.version>${mscale-mt.version}</mscale-common.version>
+		<hitrust-pkcs11.version>1.2.42</hitrust-pkcs11.version>
+
+		<log4j.version>2.18.0</log4j.version>
+		<commons-codec.version>1.14</commons-codec.version>
+
+		<jakarta-xml-bind.version>2.3.3</jakarta-xml-bind.version>
+
+	</properties>
+
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.36</version>
+		</dependency>		
+	</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>1.8</source>
+					<target>${java.version}</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.ulisesbocchio</groupId>
+				<artifactId>jasypt-maven-plugin</artifactId>
+				<version>3.0.3</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>set-system-properties</goal>
+						</goals>
+						<configuration>
+							<properties>
+								<property>
+									<name>sendCredentialsOverHttp</name>
+									<value>true</value>
+								</property>
+							</properties>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>${jib.version}</version>
+				<configuration>
+					<container>
+						<ports>
+							<port>8080</port>
+						</ports>
+						<mainClass>${jib.mainClass}</mainClass>
+					</container>
+					<from>
+						<image>${jib.from-image}</image>
+					</from>
+					<to>
+						<image>${env.IMAGE_REGISTRY}/${project.groupId}/${project.artifactId}:${project.version}</image>
+						<tags>
+							<tag>latest</tag>
+						</tags>
+						<auth>
+							<username>${env.IMAGE_REGISTRY_USER}</username>
+							<password>${env.IMAGE_REGISTRY_MEMA}</password>
+						</auth>
+					</to>
+					<allowInsecureRegistries>true</allowInsecureRegistries>
+
+				</configuration>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${maven-deploy-plugin.version}</version>
+				<configuration>
+					<skip>${skipStaging}</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.8</version>
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<serverId>nexus</serverId>
+					<nexusUrl>http://repo.hitrust.com.tw:8081/nexus/</nexusUrl>
+					<skipStaging>${skipStaging}</skipStaging>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<pluginRepositories>
+
+		<pluginRepository>
+			<id>spring-release</id>
+			<name>Spring release</name>
+			<url>https://repo.spring.io/release</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<modules>
+		<module>msecure-graalvm</module>
+	</modules>
+</project>

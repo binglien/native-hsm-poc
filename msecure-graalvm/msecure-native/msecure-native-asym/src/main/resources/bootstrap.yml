@@ -1,0 +1,44 @@
+#*****************************************************************************************
+# Copyright (c) 2020, HiTRUST and/or its affiliates. All rights reserved.
+# HiTRUST PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+#
+# Modify History:
+# 2020/07/06, v1.0.0, Bing.   First version
+#*****************************************************************************************
+# Please maintain ONLY default properties of common Spring Boot/Cloud Client in this file, 
+# move shared properties of your application to src/main/resources/application.yml,
+# move different properties of your application to src/main/resources/application-<profiles>.yml
+
+server:
+  port: 8080
+  shutdown: graceful
+###############################################################################
+## Monitoring Related
+###############################################################################    
+# Spring Cloud Actuator     
+management:
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+      probes:
+        enabled: true
+    shutdown:
+      enabled: true
+    env:
+      enabled: false
+    info:
+      enabled: false
+    bean:
+      enabled: false
+
+
+###############################################################################
+## Discovery, Reqistration and Configuration Servers Information
+###############################################################################
+# Spring Boot
+spring:
+  application:
+    name: msecure-native-asym
+  lifecycle:
+    timeout-per-shutdown-phase: 30s    
