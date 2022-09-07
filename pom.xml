@@ -196,6 +196,8 @@
 	</pluginRepositories>
 
 	<modules>
+		<module>msecure-springboot-webflux</module>
+		<module>msecure-springboot</module>
 		<module>msecure-graalvm</module>
 	</modules>
 </project>
