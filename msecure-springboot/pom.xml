@@ -48,10 +48,6 @@
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-yaml</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.hitrust.mgear.demo</groupId>
-			<artifactId>msecure-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+
 	</dependencies>
 </project>

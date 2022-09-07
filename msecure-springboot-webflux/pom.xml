@@ -46,10 +46,6 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-kubernetes-fabric8-all</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.hitrust.mgear.demo</groupId>
-			<artifactId>msecure-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+
 	</dependencies>
 </project>
